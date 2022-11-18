@@ -30,12 +30,21 @@ export async function getTicketTypes(req: AuthenticatedRequest, res: Response) {
 }
 
 export async function createTicket(req: AuthenticatedRequest, res: Response) {
+  const { userId } = req;
+  const { ticketTypeId } = req.body;
+
   try {
-    res.status(200).send("to do");
+    const ticket = await ticketsService.createTicket(userId, ticketTypeId);
+
+    res.status(httpStatus.CREATED).send(ticket);
     return;
   } catch (error) {
+    console.log(error);
     if (error.name === "NotFoundError") {
       return res.sendStatus(httpStatus.NOT_FOUND);
+    }
+    if (error.name === "BadRequestError") {
+      return res.sendStatus(httpStatus.BAD_REQUEST);
     }
     return res.sendStatus(httpStatus.INTERNAL_SERVER_ERROR);
   }

@@ -31,3 +31,5 @@ export type RequestError = {
 };
 
 export type getTicketResult = Ticket & { TicketType: TicketType };
+
+export type createTicketResult = Ticket & { TicketType: TicketType };
