@@ -3,9 +3,12 @@ import ticketsService from "@/services/tickets-service";
 import { Response } from "express";
 import httpStatus from "http-status";
 
-export async function getTickets(req: AuthenticatedRequest, res: Response) {
+export async function getTicket(req: AuthenticatedRequest, res: Response) {
+  const { userId } = req;
+
   try {
-    res.status(200).send("to do");
+    const ticket = await ticketsService.getTicket(userId);
+    res.status(httpStatus.OK).send(ticket);
     return;
   } catch (error) {
     if (error.name === "NotFoundError") {
