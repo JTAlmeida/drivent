@@ -4,25 +4,43 @@ import { Response } from "express";
 import httpStatus from "http-status";
 
 export async function getPayment(req: AuthenticatedRequest, res: Response) {
+  const { userId } = req;
+
+  const ticketId = Number(req.query.ticketId);
+  if (!ticketId) {
+    return res.sendStatus(httpStatus.BAD_REQUEST);
+  }
+
   try {
-    res.status(200).send("to do");
-    return;
+    const payment = await paymentsService.getPaymentByTicket(userId, ticketId);
+    return res.status(httpStatus.OK).send(payment);
   } catch (error) {
-    if (error.name === "NotFoundError") {
+    if (error.name == "NotFoundError") {
       return res.sendStatus(httpStatus.NOT_FOUND);
+    }
+    if (error.name == "UnauthorizedError") {
+      return res.sendStatus(httpStatus.UNAUTHORIZED);
     }
     return res.sendStatus(httpStatus.INTERNAL_SERVER_ERROR);
   }
 }
 
 export async function processPayment(req: AuthenticatedRequest, res: Response) {
+  const { userId } = req;
+  const { ticketId, cardData } = req.body;
+
   try {
-    res.status(200).send("to do");
-    return;
+    const payment = await paymentsService.processPayment(userId, ticketId, cardData);
+
+    return res.status(httpStatus.OK).send(payment);
   } catch (error) {
-    if (error.name === "NotFoundError") {
+    if (error.name == "NotFoundError") {
       return res.sendStatus(httpStatus.NOT_FOUND);
     }
+    if (error.name == "UnauthorizedError") {
+      return res.sendStatus(httpStatus.UNAUTHORIZED);
+    }
+
     return res.sendStatus(httpStatus.INTERNAL_SERVER_ERROR);
   }
 }
