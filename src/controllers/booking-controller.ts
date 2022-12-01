@@ -4,9 +4,17 @@ import bookingService from "@/services/booking-service";
 import httpStatus from "http-status";
 
 export async function getBooking(req: AuthenticatedRequest, res: Response) {
+  const { userId } = req;
+
   try {
-    return res.status(httpStatus.OK).send("toDo");
+    const booking = await bookingService.getBooking(userId);
+
+    res.status(httpStatus.OK).send(booking);
+    return;
   } catch (error) {
+    if (error.name === "NotFoundError") {
+      return res.sendStatus(httpStatus.NOT_FOUND);
+    }
     return res.sendStatus(httpStatus.INTERNAL_SERVER_ERROR);
   }
 }
