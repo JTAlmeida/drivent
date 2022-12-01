@@ -172,7 +172,7 @@ describe("GET /hotels/:hotelId", () => {
 
     it("should respond with status 200 and with given hotel rooms data.", async () => {
       const hotel = await createHotel();
-      const room = await createRoom(hotel.id);
+      const room = await createRoom({ hotelId: hotel.id });
       const token = await generateValidToken();
       const response = await server.get(`/hotels/${hotel.id}`).set("Authorization", `Bearer ${token}`);
 
