@@ -44,15 +44,22 @@ export async function updateBooking(req: AuthenticatedRequest, res: Response) {
   const { roomId } = req.body;
   const bookingId = Number(req.params.bookingId);
 
-  if (typeof bookingId !== "number") {
+  if (isNaN(bookingId)) {
     res.sendStatus(httpStatus.BAD_REQUEST);
     return;
   }
 
   try {
-    const booking = await bookingService;
-    return res.status(httpStatus.OK).send("toDo");
+    const booking = await bookingService.updateBooking(userId, roomId, bookingId);
+    res.status(httpStatus.OK).send({ bookingId: booking.id });
+    return;
   } catch (error) {
+    if (error.name === "NotFoundError") {
+      return res.sendStatus(httpStatus.NOT_FOUND);
+    }
+    if (error.name === "ForbiddenError") {
+      return res.sendStatus(httpStatus.FORBIDDEN);
+    }
     return res.sendStatus(httpStatus.INTERNAL_SERVER_ERROR);
   }
 }

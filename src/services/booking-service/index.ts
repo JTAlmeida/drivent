@@ -53,6 +53,40 @@ async function createBooking(userId: number, roomId: number): Promise<Booking> {
   return booking;
 }
 
-const bookingService = { getBooking, createBooking };
+async function updateBooking(userId: number, roomId: number, bookingId: number): Promise<Booking> {
+  const ticket = await ticketsRepository.findTicketByUserId(userId);
+
+  if (
+    !ticket ||
+    !ticket.TicketType.includesHotel ||
+    ticket.status !== TicketStatus.PAID ||
+    ticket.TicketType.isRemote
+  ) {
+    throw forbiddenError();
+  }
+
+  const booking = await bookingRepository.findBookingById(bookingId);
+  if (!booking || booking.userId !== userId) {
+    throw forbiddenError();
+  }
+
+  const newRoom = await roomsRepository.findRoomById(roomId);
+  if (!newRoom) {
+    throw notFoundError();
+  }
+
+  if (booking.Room.id === newRoom.id) {
+    throw forbiddenError();
+  }
+
+  const checkRoomBookings = await bookingRepository.findBookingByRoomId(newRoom.id);
+  if (checkRoomBookings.length >= newRoom.capacity) {
+    throw forbiddenError();
+  }
+
+  await bookingRepository.updateBooking(booking.id, newRoom.id);
+  return booking;
+}
+const bookingService = { getBooking, createBooking, updateBooking };
 
 export default bookingService;
