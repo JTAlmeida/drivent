@@ -40,7 +40,17 @@ export async function createBooking(req: AuthenticatedRequest, res: Response) {
 }
 
 export async function updateBooking(req: AuthenticatedRequest, res: Response) {
+  const { userId } = req;
+  const { roomId } = req.body;
+  const bookingId = Number(req.params.bookingId);
+
+  if (typeof bookingId !== "number") {
+    res.sendStatus(httpStatus.BAD_REQUEST);
+    return;
+  }
+
   try {
+    const booking = await bookingService;
     return res.status(httpStatus.OK).send("toDo");
   } catch (error) {
     return res.sendStatus(httpStatus.INTERNAL_SERVER_ERROR);
