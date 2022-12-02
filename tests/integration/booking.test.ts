@@ -15,7 +15,6 @@ import {
   createRoom,
   createBooking,
 } from "../factories";
-import { create } from "domain";
 
 beforeAll(async () => {
   await init();
